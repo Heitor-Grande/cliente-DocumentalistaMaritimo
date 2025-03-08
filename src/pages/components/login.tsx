@@ -1,18 +1,66 @@
-import { TextField } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import Card from "@mui/material/Card"
 import logo from "../../images/Sem nome (1000 x 1000 px).jpg"
 import Avatar from "@mui/material/Avatar"
 import navioImg from "../../images/ship-4490852_960_720.jpg"
 import CadUsuario from './cadUsuario';
 import { useState } from 'react';
+import ModalLoading from './components/loading';
+import axios from 'axios';
+import ModalMessage from './components/modalMessage';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
+
+    const navigate = useNavigate()
 
     //controlando modal de cadastrar usuario
     const [showModalCadUsuario, setShowModalCadUsuario] = useState(false)
     function setShowModalCadUsuarioClick() {
         setShowModalCadUsuario(!showModalCadUsuario)
     }
+
+    //controlando modal loading
+    const [showModalLoading, setShowModalLoading] = useState(false)
+
+    //faz login
+    function login(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+        setShowModalLoading(true)
+        axios.post(process.env.REACT_APP_API_URL + 'usuario/login/aquaviario', {
+            email, senha
+        }).then(function (resposta) {
+
+
+            sessionStorage.setItem("token", resposta.data.tokenjwt)
+            sessionStorage.setItem("usuarioID", resposta.data.usuarioID)
+            sessionStorage.setItem("email", resposta.data.email)
+            setShowModalLoading(false)
+            navigate("/menu")
+        }).catch(function (erro) {
+
+            setShowModalLoading(false)
+            setShowModalMessageClick(erro.response.data.message || "Erro ao tentar fazer login.")
+        })
+    }
+
+    //controlando modal message
+    const [modalMessage, setModalMessage] = useState({
+        mensagem: "",
+        show: false,
+        menssagemBtn: "Ok"
+    })
+    function setShowModalMessageClick(mensagem?: string) {
+        setModalMessage({
+            ...modalMessage,
+            mensagem: mensagem ? mensagem : "",
+            show: !modalMessage.show
+        })
+    }
+
+    //dados de login
+    const [email, setEmail] = useState("")
+    const [senha, setSenha] = useState("")
 
     return (
         <div className="container mt-5">
@@ -30,14 +78,20 @@ function Login() {
                                     <img style={{ width: "100%" }} src={navioImg} alt="" />
                                 </div>
                                 <div className='col-sm col-md-7 col-lg-6 mx-auto mt-2'>
-                                    <p className='text-center border-bottom border-3'>Login</p>
-                                    <div className='fieldEmailLogin m-auto'>
-                                        <TextField fullWidth id="emailLogin" label="E-mail" variant="outlined" size="small" />
-                                        <p className='mt-1 text-secondary'><small><strong>*Nunca compartilhe essas informações.</strong></small></p>
-                                    </div>
-                                    <div className='fieldSenhaLogin mx-auto mt-3'>
-                                        <TextField fullWidth id="senhaLogin" label="Senha" type="password" variant="outlined" size="small" />
-                                    </div>
+                                    <form onSubmit={login}>
+                                        <p className='text-center border-bottom border-3'>Login</p>
+                                        <div className='fieldEmailLogin m-auto'>
+                                            <TextField fullWidth value={email} onChange={function (e) { setEmail(e.target.value) }} id="emailLogin" label="E-mail" variant="outlined" size="small" />
+                                            <p className='mt-1 text-secondary'><small><strong>*Nunca compartilhe essas informações.</strong></small></p>
+                                        </div>
+                                        <div className='fieldSenhaLogin mx-auto mt-3'>
+                                            <TextField fullWidth value={senha} onChange={function (e) { setSenha(e.target.value) }} id="senhaLogin" label="Senha" type="password" variant="outlined" size="small" />
+                                        </div>
+                                        <div className='fieldSenhaLogin mx-auto mt-3'>
+                                            <Button type="submit" fullWidth variant="contained" color="primary"> Entrar</Button>
+                                        </div>
+                                    </form>
+
                                     <div className="text-center mt-2">
                                         <button type="button" className="text-secondary link btn text-center border-0"><strong><u>Esqueci minha senha</u></strong></button>
                                     </div>
@@ -51,6 +105,8 @@ function Login() {
                 </div>
             </div>
             <CadUsuario show={showModalCadUsuario} onOpenClose={setShowModalCadUsuarioClick} />
+            <ModalLoading show={showModalLoading} />
+            <ModalMessage show={modalMessage.show} mensagem={modalMessage.mensagem} mensagemBtn={modalMessage.menssagemBtn} openClose={setShowModalMessageClick} />
         </div>
     )
 }

@@ -22,7 +22,7 @@ function ModalMessage({
     const style = {
         margin: "auto",
         marginTop: "15%",
-        width: "60%",
+        width: "80%",
         bgcolor: 'background.paper',
         p: 3
     }

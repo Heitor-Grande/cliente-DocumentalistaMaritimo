@@ -5,7 +5,7 @@ import Modal from '@mui/material/Modal';
 interface ModalLoading {
     show: boolean
 
-    openClose: () => void
+    openClose?: () => void
 }
 
 function ModalLoading({
