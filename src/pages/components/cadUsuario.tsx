@@ -7,6 +7,9 @@ import estados from '../../config/estados';
 import categorias from '../../config/categoriasNavais';
 import { useEffect, useState } from 'react';
 import aquaviarioType from '../../interfaces/aquaviarioType';
+import axios from 'axios';
+import ModalMessage from './components/modalMessage';
+import ModalLoading from './components/loading';
 
 interface CadUsuarioTypeModal {
 
@@ -44,6 +47,63 @@ function CadUsuario({
 
     function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
+        
+        setShowModalLoading(true)
+        if (sessionStorage.getItem("codCriacao")) {
+            //verifica código digitado
+            if (codigo === sessionStorage.getItem("codCriacao")) {
+                //cria o usuario
+                //envia o e-mail com o código de confirmação
+                axios.post(process.env.REACT_APP_API_URL + "usuario/criar/usuario/finalizar/cadastro", aquaviario)
+                    .then(function (resposta) {
+                        setShowModalLoading(false)
+                        setShowModalConfirmarCodigoClick()
+                        onOpenClose()
+                    }).catch(function (erro) {
+                        console.log("--- Erro ao finalizar cadastro ---")
+                        console.error(erro)
+
+                        setModalMensagem({
+                            ...modalMensagem,
+                            mensagem: erro.response.data.message || "Erro ao finalizar cadastro.",
+                            mensagemBtn: "Ok"
+                        })
+                        setShowModalMenssagemClick()
+                        setShowModalLoading(false)
+                    })
+            }
+            else {
+                setModalMensagem({
+                    ...modalMensagem,
+                    mensagem: "Código Inválido.",
+                    mensagemBtn: "Ok"
+                })
+
+                setShowModalLoading(false)
+                setShowModalMenssagemClick()
+            }
+        }
+        else {
+            //envia o e-mail com o código de confirmação
+            axios.post(process.env.REACT_APP_API_URL + "usuario/enviar/email/criacao/conta", aquaviario)
+                .then(function (resposta) {
+
+                    sessionStorage.setItem("codCriacao", resposta.data.codigo)
+                    setShowModalLoading(false)
+                    console.log("passei")
+                    setShowModalConfirmarCodigoClick()
+                }).catch(function (erro) {
+                    console.log("--- Erro ao enviar E-mail ---")
+                    console.error(erro)
+                    setModalMensagem({
+                        ...modalMensagem,
+                        mensagem: erro.response.data.message || "Erro ao enviar e-mail de cadastro.",
+                        mensagemBtn: "Ok"
+                    })
+                    setShowModalMenssagemClick()
+                    setShowModalLoading(false)
+                })
+        }
     }
 
     const [forcaSenha, setForcaSenha] = useState(false)
@@ -64,6 +124,45 @@ function CadUsuario({
 
         setForcaSenha(verificarForcaSenha(aquaviario?.senha))
     }, [aquaviario?.senha])
+
+    //controlando modal da mensagem 
+    const [showModalMensagem, setShowModalMenssagem] = useState(false)
+    function setShowModalMenssagemClick() {
+
+        setShowModalMenssagem(!showModalMensagem)
+    }
+
+    const [modalMensagem, setModalMensagem] = useState({
+        show: false,
+        mensagem: "",
+        mensagemBtn: "",
+    })
+
+    //modal de confirmar código
+    //style do Card do modal
+    const styleCodigo = {
+        margin: "auto",
+        marginTop: "15%",
+        width: "60%",
+        bgcolor: 'background.paper',
+        p: 3
+    }
+    const [showModalConfirmarCodigo, setShowModalConfirmarCodigo] = useState(false)
+    function setShowModalConfirmarCodigoClick() {
+        setShowModalConfirmarCodigo(!showModalConfirmarCodigo)
+    }
+
+    const [codigo, setCodigo] = useState("")
+
+    //controlando modal de loading
+    const [showModalLoading, setShowModalLoading] = useState(false)
+    function setShowModalLoadingClick() {
+        setShowModalLoading(!showModalLoading)
+    }
+    
+    useEffect(function(){
+        console.log(showModalLoading)
+    }, [showModalLoading])
 
     return (
         <Modal
@@ -206,7 +305,7 @@ function CadUsuario({
                                 </TextField>
                             </div>
                             <div className='col-sm col-md-12 col-lg-3 mt-2'>
-                                <TextField value={aquaviario?.altura} onChange={(e) => setValuesAquaviario(e, 'altura')} required fullWidth id="estatura" label="Altura em CM" variant="outlined" size="small" />
+                                <TextField type="number" value={aquaviario?.altura} onChange={(e) => setValuesAquaviario(e, 'altura')} required fullWidth id="estatura" label="Altura em CM" variant="outlined" size="small" />
                             </div>
                             <div className='col-sm col-md-12 col-lg-3 mt-2'>
                                 <TextField
@@ -295,6 +394,37 @@ function CadUsuario({
                         </div>
                     </div>
                 </form>
+                <ModalMessage show={showModalMensagem} mensagem={modalMensagem.mensagem} mensagemBtn={modalMensagem.mensagemBtn} openClose={setShowModalMenssagemClick} />
+                <Modal
+                    open={showModalConfirmarCodigo}
+                    onClose={setShowModalConfirmarCodigoClick}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                    sx={{ overflow: "auto" }}
+                >
+                    <Card style={styleCodigo}>
+                        <form onSubmit={onSubmit}>
+                            <div className='container-fluid'>
+                                <div className='row mt-3'>
+                                    <p className='text-center'>
+                                        Digite o código recebido no e-mail cadastrado. <strong>Não recarregue a página atual.</strong>
+                                    </p>
+                                </div>
+                                <div className='row px-3 pb-2'>
+                                    <div className='col-sm col-md-12 col-lg-8'>
+                                        <TextField value={codigo} onChange={(e) => { setCodigo(e.target.value) }} required fullWidth label="Código" variant="outlined" size="small" />
+                                    </div>
+                                    <div className='col-sm col-md-12 col-lg-4'>
+                                        <Button type="submit" fullWidth variant="contained" color="primary">
+                                            Validar Código
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </Card>
+                </Modal>
+                <ModalLoading show={showModalLoading} openClose={setShowModalLoadingClick} />
             </Card>
         </Modal>
     )
