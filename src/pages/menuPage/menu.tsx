@@ -111,7 +111,7 @@ function MenuPage() {
 
 
         if (pathMonitor !== "") {
-            
+
             validarJWTusuario()
         }
 

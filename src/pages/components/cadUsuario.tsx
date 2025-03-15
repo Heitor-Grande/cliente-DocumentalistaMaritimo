@@ -261,7 +261,7 @@ function CadUsuario({
                                     select
                                     label="Naturalidade"
                                     size="small"
-                                    value={aquaviario?.nacionalidade}
+                                    value={aquaviario?.naturalidade}
                                     onChange={(e) => setValuesAquaviario(e, 'naturalidade')}
                                 >
                                     {

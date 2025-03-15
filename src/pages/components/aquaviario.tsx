@@ -14,6 +14,51 @@ function Aquaviario() {
     //objeto Aquáviário
     const [aquaviario, setAquaviario] = useState<aquaviarioType>()
 
+    //carregar informações do usuario
+    function carregarInfoUsuarioLogado() {
+        setShowModalLoading(true)
+        axios.post(process.env.REACT_APP_API_URL + `usuario/carregar/dados/usuario/${sessionStorage.getItem("usuarioID")}`, {
+            email: sessionStorage.getItem("email") || "",
+            usuarioID: sessionStorage.getItem("usuarioID") || ""
+        }, {
+            headers: {
+                token: sessionStorage.getItem("token") || ""
+            }
+        }).then(function (resposta) {
+
+            const aquaviario: aquaviarioType = {
+                id: resposta.data.id?.toString(),
+                nome: resposta.data.nome,
+                inscricaoAtual: resposta.data.ninscricao,
+                inscricaoAntiga: resposta.data.ninscricao_antigo,
+                situacao: resposta.data.situacao,
+                dataInscricao: resposta.data.datainscricao,
+                cpf: resposta.data.cpf,
+                identidade: resposta.data.identidade,
+                nacionalidade: resposta.data.nacionalidade,
+                naturalidade: resposta.data.naturalidade,
+                dataNascimento: resposta.data.data_nascimento,
+                sexo: resposta.data.sexo,
+                altura: resposta.data.altura?.toString(),
+                corDosOlhos: resposta.data.cor_olhos,
+                competencia: resposta.data.categoria,
+                dataCategoria: resposta.data.data_categoria,
+                DataDaValidade: resposta.data.data_validade_categoria,
+                email: resposta.data.email,
+                senha: "",
+                confirmarSenha: "" // Caso tenha um campo para confirmar senha, pode ser tratado de outra forma.
+            };
+
+            setAquaviario(aquaviario)
+
+            setShowModalLoading(false)
+        }).catch(function (erro) {
+
+            setShowModalLoading(false)
+            setShowModalMessageClick(erro.response.data.message || "Ocorreu um erro ao tentar carregar Usuário.")
+        })
+    }
+
     //função para alterar valor do aquaviario
     type aquaviarioCampos = keyof aquaviarioType
     function setValuesAquaviario(evento: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, propriedade: aquaviarioCampos) {
@@ -62,9 +107,11 @@ function Aquaviario() {
 
         setShowModalLoading(true)
 
-        axios.post(process.env.REACT_APP_API_URL + `/usuario/atualizar/cadastro/usuario/${sessionStorage.getItem("usuarioID")}`, aquaviario, {
+        axios.put(process.env.REACT_APP_API_URL + `usuario/atualizar/cadastro/usuario/${sessionStorage.getItem("usuarioID")}`, aquaviario, {
             headers: {
-                Authorization: ""
+                token: sessionStorage.getItem("token") || "",
+                email: sessionStorage.getItem("email"),
+                usuarioid: sessionStorage.getItem("usuarioID")
             }
         }).then(function (resposta) {
             setShowModalLoading(false)
@@ -81,10 +128,10 @@ function Aquaviario() {
         setForcaSenha(verificarForcaSenha(aquaviario?.senha))
     }, [aquaviario?.senha])
 
-    //função para carregar dados do aquaviario
-    function carregarDadosUsuario() {
+    useEffect(function () {
 
-    }
+        carregarInfoUsuarioLogado()
+    }, [])
 
 
     return (
@@ -116,7 +163,7 @@ function Aquaviario() {
                                 select
                                 label="Situação"
                                 size="small"
-                                value={aquaviario?.situacao}
+                                value={aquaviario?.situacao || ""}
                                 onChange={(e) => setValuesAquaviario(e, 'situacao')}
                             >
                                 <MenuItem key={0} value={'Ativo'}>
@@ -150,7 +197,7 @@ function Aquaviario() {
                                 select
                                 label="Nacionalidade"
                                 size="small"
-                                value={aquaviario?.nacionalidade}
+                                value={aquaviario?.nacionalidade || ""}
                                 onChange={(e) => setValuesAquaviario(e, 'nacionalidade')}
                             >
                                 {
@@ -172,7 +219,7 @@ function Aquaviario() {
                                 select
                                 label="Naturalidade"
                                 size="small"
-                                value={aquaviario?.nacionalidade}
+                                value={aquaviario?.naturalidade || ""}
                                 onChange={(e) => setValuesAquaviario(e, 'naturalidade')}
                             >
                                 {
@@ -204,7 +251,7 @@ function Aquaviario() {
                                 select
                                 label="Sexo"
                                 size="small"
-                                value={aquaviario?.sexo}
+                                value={aquaviario?.sexo || ''}
                                 onChange={(e) => setValuesAquaviario(e, 'sexo')}
                             >
                                 <MenuItem key={0} value={'Masculino'}>
@@ -226,7 +273,7 @@ function Aquaviario() {
                                 select
                                 label="Cor dos Olhos"
                                 size="small"
-                                value={aquaviario?.corDosOlhos} onChange={(e) => setValuesAquaviario(e, 'corDosOlhos')}
+                                value={aquaviario?.corDosOlhos || ""} onChange={(e) => setValuesAquaviario(e, 'corDosOlhos')}
                             >
                                 <MenuItem key={0} value="Azul">Azul</MenuItem>
                                 <MenuItem key={1} value="Verde">Verde</MenuItem>
@@ -252,7 +299,7 @@ function Aquaviario() {
                                 select
                                 label="Categoria"
                                 size="small"
-                                value={aquaviario?.competencia} onChange={(e) => setValuesAquaviario(e, 'competencia')}
+                                value={aquaviario?.competencia || ""} onChange={(e) => setValuesAquaviario(e, 'competencia')}
                             >
                                 {
                                     categorias.map(function (categoria, index) {
