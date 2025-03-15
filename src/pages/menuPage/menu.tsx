@@ -9,7 +9,9 @@ import Aquaviario from '../components/aquaviario';
 import { useNavigate } from 'react-router-dom';
 import ModalLoading from '../components/components/loading';
 import axios from 'axios';
+import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import { useState, useEffect } from 'react';
+import DocumentsAquaviario from '../components/documentsAquaviaro';
 
 function MenuPage() {
 
@@ -30,7 +32,12 @@ function MenuPage() {
         },
         {
             kind: 'divider',
-        }
+        },
+        {
+            segment: "documentsAquaviario",
+            title: "Documentos",
+            icon: < DriveFolderUploadIcon />,
+        },
         /*{
             segment: 'reports',
             title: 'Reports',
@@ -67,7 +74,8 @@ function MenuPage() {
 
     //mapeamento das páginas
     const PAGES: Record<string, React.ReactNode> = {
-        aquaviario: <Aquaviario />
+        aquaviario: <Aquaviario />,
+        documentsAquaviario: <DocumentsAquaviario />
     }
 
     //função para verificar JWT do usuario
