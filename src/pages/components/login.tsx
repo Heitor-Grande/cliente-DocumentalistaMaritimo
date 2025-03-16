@@ -35,8 +35,16 @@ function Login() {
             sessionStorage.setItem("token", resposta.data.tokenjwt)
             sessionStorage.setItem("usuarioID", resposta.data.usuarioID)
             sessionStorage.setItem("email", resposta.data.email)
+            sessionStorage.setItem("isadmin", resposta.data.isadmin)
             setShowModalLoading(false)
-            navigate("/menu")
+            if (resposta.data.isadmin == true) {
+
+                navigate("/menu/admin")
+            }
+            else {
+
+                navigate("/menu")
+            }
         }).catch(function (erro) {
 
             setShowModalLoading(false)
