@@ -1,4 +1,4 @@
-import { Button, Card } from '@mui/material';
+import { Button, Card, Link } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -11,8 +11,11 @@ import ModalLoading from './components/loading';
 import axios from 'axios';
 import ModalMessage from './components/modalMessage';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function VisaoGeral() {
+
+    const navigate = useNavigate()
 
     //controlando modal loading
     const [showModalLoading, setShowModalLoading] = useState(false)
@@ -105,7 +108,7 @@ function VisaoGeral() {
             <ModalLoading show={showModalLoading} />
             <div className="container-fluid pt-2 pb-2">
                 <div className='row p-2'>
-                    <TextField onChange={(e) => { setBusca(e.target.value) }} required fullWidth id="nomeAquav" label="Procurar por nome..." variant="outlined" size="small" />
+                    <TextField value={busca} onChange={(e) => { setBusca(e.target.value.toUpperCase()) }} fullWidth id="nomeAquav" label="Procurar por nome..." variant="outlined" size="small" />
                 </div>
                 <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -123,7 +126,11 @@ function VisaoGeral() {
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell component="th" scope="row">
-                                        {row.nome}
+                                        <Button variant="text" onClick={function () {
+                                            sessionStorage.setItem("usuarioID", row.id)
+                                            sessionStorage.setItem("email", row.email)
+                                            navigate("/menu")
+                                        }}>{row.nome}</Button>
                                     </TableCell>
                                     <TableCell align="center" component="th" scope="row">
                                         {row.cpf}

@@ -345,9 +345,13 @@ function Aquaviario() {
                     </div>
                     <div className='row border-top border-2 mt-2'>
                         <div className='col-sm col-md-12 col-lg-12 mt-2'>
-                            <Button type="submit" disabled={aquaviario?.senha === aquaviario?.confirmarSenha && aquaviario?.senha !== undefined && aquaviario.senha !== "" && aquaviario?.confirmarSenha !== undefined && aquaviario.confirmarSenha !== "" && forcaSenha === true ? false : true} fullWidth variant="contained" color="primary">
-                                Atualizar Cadastro
-                            </Button>
+                            {
+                                !sessionStorage.getItem("isadmin") &&
+                                <Button type="submit" disabled={aquaviario?.senha === aquaviario?.confirmarSenha && aquaviario?.senha !== undefined && aquaviario.senha !== "" && aquaviario?.confirmarSenha !== undefined && aquaviario.confirmarSenha !== "" && forcaSenha === true ? false : true} fullWidth variant="contained" color="primary">
+                                    Atualizar Cadastro
+                                </Button>
+                            }
+
                         </div>
                     </div>
                 </div>
