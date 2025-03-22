@@ -4,13 +4,12 @@ import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Avatar from "@mui/material/Avatar"
 import logo from "../../images/Sem nome (1000 x 1000 px).jpg"
 import theme from '../../config/theme';
-import Aquaviario from '../components/aquaviario';
 import { useNavigate } from 'react-router-dom';
 import ModalLoading from '../components/components/loading';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import DocumentsAquaviario from '../components/documentsAquaviaro';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import VisaoGeral from '../components/visaoGeral';
 
 function MenuAdministrativoPage() {
 
@@ -65,8 +64,7 @@ function MenuAdministrativoPage() {
 
     //mapeamento das páginas
     const PAGES: Record<string, React.ReactNode> = {
-        aquaviario: <Aquaviario />,
-        documentsAquaviario: <DocumentsAquaviario />
+        visaogeral: <VisaoGeral />
     }
 
     //função para verificar JWT do usuario
@@ -76,8 +74,8 @@ function MenuAdministrativoPage() {
         if (sessionStorage.getItem("isadmin") == 'true') {
             axios.post(process.env.REACT_APP_API_URL + 'usuario/validar/usuario/login', {
 
-                email: sessionStorage.getItem("email") || "",
-                usuarioID: sessionStorage.getItem("usuarioID") || ""
+                email: sessionStorage.getItem("email_admin") || "",
+                usuarioID: sessionStorage.getItem("usuarioID_admin") || ""
 
 
             },
