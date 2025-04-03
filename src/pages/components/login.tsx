@@ -106,7 +106,9 @@ function Login() {
                                     </form>
 
                                     <div className="text-center mt-2">
-                                        <button type="button" className="text-secondary link btn text-center border-0"><strong><u>Esqueci minha senha</u></strong></button>
+                                        <button  onClick={function(){
+                                            navigate("/menu/rec/senha/user")
+                                        }} type="button" className="text-secondary link btn text-center border-0"><strong><u>Esqueci minha senha</u></strong></button>
                                     </div>
                                     <div className="text-center mt-4">
                                         <button onClick={setShowModalCadUsuarioClick} type="button" className="text-primary link btn text-center border-0"><strong><u>Ainda não tem uma conta? Clique aqui para criar!</u></strong></button>
